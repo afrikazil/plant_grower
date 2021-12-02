@@ -12,8 +12,8 @@ String WebServer::getPoints(){
       {
         String netName=WiFi.SSID(i);
 
-        points += "<input type='radio' name='ssid' value='"+netName+"'>\
-                <label for='html'>"+netName+"</label><br>";       
+        points += "<input type='radio' id='id_"+netName+"' name='ssid' value='"+netName+"'>\
+                <label for='id_"+netName+"'>"+netName+"</label><br>";       
       }
      
       delay(100);
@@ -55,6 +55,7 @@ void WebServer::webSetup()
     EEPROM.commit();    
     String content = "{\"Success\":\"saved to eeprom... reset to boot into new wifi\"}";
     webServer->send(200, "application/json", content);
+    ESP.restart();
 }
 
 void WebServer::clearEeprom()
