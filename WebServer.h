@@ -13,6 +13,7 @@ class WebServer
     void webSetup();
     void webReboot();
     void webStyles();
+    void clearEeprom();
     String getPoints();
     
   public:

@@ -11,6 +11,7 @@ class WiFiConnection
   public:
     void startAP();
     void connectTo(String esid, String epass);
+    bool testWiFi();
 };
 
 #endif

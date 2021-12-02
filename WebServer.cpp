@@ -57,16 +57,22 @@ void WebServer::webSetup()
     webServer->send(200, "application/json", content);
 }
 
+void WebServer::clearEeprom()
+{
+      String content = "<!DOCTYPE HTML>\r\n<html>";
+      content += "<p>Clearing the EEPROM</p></html>";
+      webServer->send(200, "text/html", content);
+      for (int i = 0; i < 96; ++i) { EEPROM.write(i, 0); }
+      EEPROM.commit();
+      ESP.restart();
+}
+
 void WebServer::setup(ESP8266WebServer* webServer)
 {
     webServer->on("/", [this](){ webRoot(); });
     webServer->on("/setting", [this](){ webSetup(); });
-//    webServer->on("/reboot", [this](){ webReboot(); });
-//    webServer->on("/styles.css", [this](){ webStyles(); });
-//    webServer->onNotFound([this](){ handleNotFound(); });
+    webServer->on("/cleareeprom", [this](){ clearEeprom(); });
     webServer->begin();
 
     this->webServer = webServer;
-//    this->config = config;
-//    this->rebootFunction = rebootFunction;
 }

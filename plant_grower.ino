@@ -20,6 +20,9 @@ void setup(){
   }
   if(esid.length() > 1){
     wiFiConnection.connectTo(esid.c_str(), epass.c_str());
+    if(!wiFiConnection.testWiFi()){
+       wiFiConnection.startAP();
+    }
   }
   else{
     wiFiConnection.startAP();
