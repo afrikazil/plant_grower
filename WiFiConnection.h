@@ -6,9 +6,6 @@
 
 class WiFiConnection
 {
-  private:
-
-
   public:
     void startAP();
 };
