@@ -13,6 +13,7 @@ class WebServer
     void webSetup();
     void webReboot();
     void webStyles();
+    String getPoints();
     
   public:
    void setup(ESP8266WebServer* webServer);
