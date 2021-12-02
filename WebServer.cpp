@@ -1,5 +1,7 @@
 #include "WebServer.h"
 #include <ESP8266WiFi.h>
+#include <EEPROM.h>
+
 
 String WebServer::getPoints(){
   String points = "";
@@ -10,7 +12,7 @@ String WebServer::getPoints(){
       {
         String netName=WiFi.SSID(i);
 
-        points += "<input type='radio' name='accessPoints' value='"+netName+"'>\
+        points += "<input type='radio' name='ssid' value='"+netName+"'>\
                 <label for='html'>"+netName+"</label><br>";       
       }
      
@@ -34,10 +36,31 @@ void WebServer::webRoot()
 
 }
 
+void WebServer::webSetup()
+{
+    String qsid =  webServer->arg("ssid");
+    String qpass = webServer->arg("pass");
+
+    for (int i = 0; i < 96; ++i) { EEPROM.write(i, 0); }
+
+
+    for (int i = 0; i < qsid.length(); ++i){
+        EEPROM.write(i, qsid[i]);
+    }
+
+    for (int i = 0; i < qpass.length(); ++i)
+    {
+      EEPROM.write(32+i, qpass[i]);
+    }
+    EEPROM.commit();    
+    String content = "{\"Success\":\"saved to eeprom... reset to boot into new wifi\"}";
+    webServer->send(200, "application/json", content);
+}
+
 void WebServer::setup(ESP8266WebServer* webServer)
 {
     webServer->on("/", [this](){ webRoot(); });
-//    webServer->on("/setup", [this](){ webSetup(); });
+    webServer->on("/setting", [this](){ webSetup(); });
 //    webServer->on("/reboot", [this](){ webReboot(); });
 //    webServer->on("/styles.css", [this](){ webStyles(); });
 //    webServer->onNotFound([this](){ handleNotFound(); });
