@@ -9,7 +9,8 @@ class WebServer
   private:
     ESP8266WebServer* webServer;
     
-    void webRoot();
+    void setupRoot();
+    void workRoot();
     void webSetup();
     void webReboot();
     void webStyles();
@@ -17,7 +18,7 @@ class WebServer
     String getPoints();
     
   public:
-   void setup(ESP8266WebServer* webServer);
+   void setup(ESP8266WebServer* webServer, int initType);
 };
 
 #endif

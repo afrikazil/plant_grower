@@ -1,7 +1,16 @@
 #include "WebServer.h"
 #include <ESP8266WiFi.h>
 #include <EEPROM.h>
+#include "time.h"
 
+String printLocalTime()
+{
+  time_t rawtime;
+  struct tm * timeinfo;
+  time (&rawtime);
+  timeinfo = localtime (&rawtime);
+  return asctime(timeinfo);
+}
 
 String WebServer::getPoints(){
   String points = "";
@@ -20,7 +29,7 @@ String WebServer::getPoints(){
   return points;
 }
 
-void WebServer::webRoot()
+void WebServer::setupRoot()
 {
     String content = "\
       <!DOCTYPE html>\r\n<html><head><meta charset='UTF-8'><meta http-equiv='X-UA-Compatible' content='IE=edge'><meta name='viewport' content='width=device-width, initial-scale=1.0'><title>Настройка подключения</title></head>\
@@ -30,11 +39,26 @@ void WebServer::webRoot()
       <form method='get' action='setting'>\
       "+getPoints()+"<br>\
       <input name='pass' length=64><input type='submit'></form>\
+      </body></html>\
     ";
 
     webServer->send(200, "text/html", content);    
-
 }
+
+
+void WebServer::workRoot()
+{
+    String content = "\
+      <!DOCTYPE html>\r\n<html><head><meta charset='UTF-8'><meta http-equiv='X-UA-Compatible' content='IE=edge'><meta name='viewport' content='width=device-width, initial-scale=1.0'><title>Ох бля, оно работает!</title></head>\
+      <style>.container{max-width: 600px;margin:0 auto;}</style>\
+      <body><div class='container'>\
+      <h1 align='center'>"+printLocalTime()+"</h1>\
+      </body></html>\
+    ";
+
+    webServer->send(200, "text/html", content);    
+}
+
 
 void WebServer::webSetup()
 {
@@ -55,6 +79,7 @@ void WebServer::webSetup()
     EEPROM.commit();    
     String content = "{\"Success\":\"saved to eeprom... reset to boot into new wifi\"}";
     webServer->send(200, "application/json", content);
+    delay(500);
     ESP.restart();
 }
 
@@ -65,13 +90,21 @@ void WebServer::clearEeprom()
       webServer->send(200, "text/html", content);
       for (int i = 0; i < 96; ++i) { EEPROM.write(i, 0); }
       EEPROM.commit();
+      delay(500);
       ESP.restart();
 }
 
-void WebServer::setup(ESP8266WebServer* webServer)
+void WebServer::setup(ESP8266WebServer* webServer, int initType)
 {
-    webServer->on("/", [this](){ webRoot(); });
-    webServer->on("/setting", [this](){ webSetup(); });
+  if(initType==0){
+     webServer->on("/", [this](){ setupRoot(); });
+     webServer->on("/setting", [this](){ webSetup(); });
+  }
+  else if(initType==1){
+    webServer->on("/", [this](){ workRoot(); });
+  }
+   
+    
     webServer->on("/cleareeprom", [this](){ clearEeprom(); });
     webServer->begin();
 
