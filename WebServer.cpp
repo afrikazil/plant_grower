@@ -63,23 +63,21 @@ void WebServer::workRoot()
 
 void WebServer::workRele()
 {
-    String chanNum =  webServer->arg("channel");
-    String type = webServer->arg("type");
-   
-    int ntype = 0;
-    Rele rele = Rele(D1,D2,D3,D4);
-//    if(!type) {
-//       webServer->send(400, "text/html", content);    
-//       return 
-//    }
-    if(type=="1") ntype = 1; 
-    if(chanNum=="1")    rele.releOnOff(1,ntype);
-    if(chanNum=="2")    rele.releOnOff(2,ntype);
-    if(chanNum=="3")    rele.releOnOff(3,ntype);
-    if(chanNum=="4")    rele.releOnOff(4,ntype);
+    int chanNum =  webServer->arg("channel").toInt() || -1;
+    String content = "";
+    if(chanNum >-1){
+      String type = webServer->arg("type");
+      Rele rele = Rele(D1,D2,D3,D4);
+      
+      int ntype = rele.OFF;
+  
+      if(type=="on") rele.on(chanNum);
+      else rele.off(chanNum); 
 
-    String content="{'ssss':'"+chanNum+" - "+type+"'}"; 
-    webServer->send(200, "text/html", content);    
+      content += "{'ssss':'"+String(chanNum)+" - " + type + "'}"; 
+    }
+    if(content.length()==0) content += "{'ssss':'ошибка'}";
+      webServer->send(200, "text/html", content);    
 }
 
 

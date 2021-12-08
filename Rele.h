@@ -7,10 +7,13 @@ class Rele {
     int IN2;
     int IN3;
     int IN4;
-
+    void releTurn(int chan, int type);
 
   public:
-    void releOnOff(int chan,int type);
+    int ON=0;
+    int OFF=1;
+    void on(int chan);
+    void off(int chan);
     Rele(int chan1,int chan2,int chan3,int chan4);
 };
 
