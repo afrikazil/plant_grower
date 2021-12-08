@@ -2,6 +2,8 @@
 #include <ESP8266WiFi.h>
 #include <EEPROM.h>
 #include "time.h"
+#include "Rele.h"
+
 
 String printLocalTime()
 {
@@ -59,6 +61,25 @@ void WebServer::workRoot()
     webServer->send(200, "text/html", content);    
 }
 
+void WebServer::workRele()
+{
+    int chanNum =  webServer->arg("channel").toInt() || -1;
+    String content = "";
+    if(chanNum >-1){
+      String type = webServer->arg("type");
+      Rele rele = Rele(D1,D2,D3,D4);
+      
+      int ntype = rele.OFF;
+  
+      if(type=="on") rele.on(chanNum);
+      else rele.off(chanNum); 
+
+      content += "{'ssss':'"+String(chanNum)+" - " + type + "'}"; 
+    }
+    if(content.length()==0) content += "{'ssss':'ошибка'}";
+      webServer->send(200, "text/html", content);    
+}
+
 
 void WebServer::webSetup()
 {
@@ -106,6 +127,7 @@ void WebServer::setup(ESP8266WebServer* webServer, int initType)
    
     
     webServer->on("/cleareeprom", [this](){ clearEeprom(); });
+     webServer->on("/workrele", [this](){ workRele(); });
     webServer->begin();
 
     this->webServer = webServer;
