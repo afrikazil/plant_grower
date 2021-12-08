@@ -11,9 +11,11 @@ class WebServer
     
     void setupRoot();
     void workRoot();
+    void workRele();
     void webSetup();
     void webReboot();
     void webStyles();
+
     void clearEeprom();
     String getPoints();
     
